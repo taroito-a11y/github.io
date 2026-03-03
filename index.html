@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アンケート</title>
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        /* 画面いっぱいにフォームを表示するための設定 */
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+
+    <iframe id="google-form" src="">読み込み中...</iframe>
+
+    <script>
+        // 1. LINE Developersで発行された LIFF ID
+        const myLiffId = "【ここにLIFF IDを入力】"; 
+
+        // 2. GoogleフォームのURL（?usp=pp_url の前まで）
+        const formBaseUrl = "https://docs.google.com/forms/d/1kFOTOBLHCzJwEhHjX9NyLg70Wa7hUEr-Xoj3QVfd9m4"; 
+        // 例: https://docs.google.com/forms/d/e/1FAIpQLSc.../viewform
+
+        // 3. ステップ1で取得した entry ID
+        const entryId = "entry.1070093808"; 
+        // 例: entry.123456789
+
+        // LIFFの初期化とプロファイル取得処理
+        async function main() {
+            try {
+                await liff.init({ liffId: myLiffId });
+
+                if (liff.isLoggedIn()) {
+                    // LINEのプロフィールを取得
+                    const profile = await liff.getProfile();
+                    const lineUserId = profile.userId;
+
+                    // 事前入力URLを組み立てる
+                    const prefilledUrl = `${formBaseUrl}?usp=pp_url&${entryId}=${lineUserId}`;
+
+                    // iframeのsrcに生成したURLをセットしてフォームを表示
+                    document.getElementById('google-form').src = prefilledUrl;
+                } else {
+                    // LINEアプリ以外で開かれた場合はログインを促す
+                    liff.login();
+                }
+            } catch (err) {
+                console.error('LIFFの初期化に失敗しました', err);
+                document.body.innerHTML = "エラーが発生しました。LINEアプリから再度お試しください。";
+            }
+        }
+
+        main();
+    </script>
+
+</body>
+</html>
